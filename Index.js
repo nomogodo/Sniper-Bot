@@ -1,27 +1,39 @@
 const { Connection, PublicKey } = require('@solana/web3.js');
 
-// Configuración de red (RPC Público)
-const RPC_URL = "https://api.mainnet-beta.solana.com";
-const WSS_URL = "wss://api.mainnet-beta.solana.com";
+
+const API_KEY = "DEQ9OCjU2hYKcZWoHYDE6"; 
+
+// Construimos las direcciones VIP
+const RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${API_KEY}`;
+const WSS_URL = `wss://mainnet.helius-rpc.com/?api-key=${API_KEY}`;
+
 const RAYDIUM_PROGRAM_ID = new PublicKey("675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8");
 
+// Conexión
 const connection = new Connection(RPC_URL, { wsEndpoint: WSS_URL });
 
 console.log("---------------------------------------------");
-console.log("🚀 BOT INICIADO DESDE GITHUB + REPLIT");
-console.log("💰 MODO: SIMULACIÓN (Sin riesgo)");
-console.log("📡 Escuchando Raydium...");
+console.log("🩺 DIAGNÓSTICO: Usando RPC Privado (Helius)");
+console.log("🔌 Conectando...");
 console.log("---------------------------------------------");
 
 async function main() {
+    // Monitor de Latido (Para ver si funciona)
+    connection.onSlotChange((slotInfo) => {
+        // Solo imprimimos cada 50 bloques para no llenar la pantalla
+        if (slotInfo.slot % 50 === 0) {
+            console.log(`💓 Conexión estable. Bloque actual: ${slotInfo.slot}`);
+        }
+    });
+
+    console.log("👁️ Escuchando Raydium...");
+    
     connection.onLogs(
         RAYDIUM_PROGRAM_ID,
         async ({ logs, err, signature }) => {
             if (err) return;
-
-            // Detectar 'initialize2' (Nuevo Pool)
             if (logs && logs.some(log => log.includes("initialize2"))) {
-                console.log(`\n🚨 NUEVA LIQUIDEZ DETECTADA!`);
+                console.log(`\n🚨 ¡NUEVO TOKEN DETECTADO!`);
                 console.log(`🔗 https://solscan.io/tx/${signature}`);
                 simularTrade();
             }
@@ -31,13 +43,9 @@ async function main() {
 }
 
 function simularTrade() {
-    const precioFalso = (Math.random() * 0.0001).toFixed(9);
-    console.log(`[SIMULACIÓN] 🛒 Compra ficticia a ${precioFalso} SOL`);
-    
-    setTimeout(() => {
-        const resultado = Math.random() > 0.4 ? "✅ PROFIT" : "❌ LOSS"; // 60% chance de ganar ficticio
-        console.log(`[SIMULACIÓN] ⏱️ Venta ficticia tras 10s: ${resultado}`);
-    }, 10000);
+    console.log(`[SIMULACIÓN] 🛒 Compra simulada ejecutada.`);
+    // Lógica simple de simulación
+    setTimeout(() => console.log(`[SIMULACIÓN] 🏁 Operación cerrada (Ficticia)`), 5000);
 }
 
 main().catch(console.error);

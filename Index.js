@@ -1,4 +1,5 @@
 const { Connection, PublicKey } = require('@solana/web3.js');
+const axios = require('axios'); // <--- AQUÍ 1: Le decimos al bot que cargue Axios
 
 const API_KEY = "84f545e5-e414-4d68-b1fc-fe13e070d03e"; 
 const RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${API_KEY}`;
@@ -8,16 +9,14 @@ const connection = new Connection(RPC_URL, { wsEndpoint: WSS_URL });
 const RAYDIUM_ID = new PublicKey("675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8");
 const PUMP_ID = new PublicKey("6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P");
 
-// TUS CANTIDADES
 let saldo = 1.5; 
 const INVERSION = 0.5; 
-
-let operando = false; // EL SEMÁFORO VITAL
+let operando = false; 
 
 async function iniciar() {
     console.log("=========================================");
-    console.log("🚦 MODO SEMÁFORO (TUS CANTIDADES)");
-    console.log(`💰 SALDO BANCARIO: ${saldo} SOL | INVERSIÓN: ${INVERSION} SOL`);
+    console.log("🚦 MODO SEMÁFORO (AHORA CON AXIOS)");
+    console.log(`💰 SALDO INICIAL: ${saldo} SOL | INVERSIÓN: ${INVERSION} SOL`);
     console.log("=========================================");
 
     connection.onSlotChange(() => { process.stdout.write("."); });
@@ -43,10 +42,10 @@ async function ejecutarOperacionReal(firmaTx) {
         process.exit();
     }
     
-    operando = true; // SEMÁFORO ROJO: Ignora el resto de tokens que salgan
+    operando = true; 
     saldo -= INVERSION;
-    console.log(`🛒 Comprando ${INVERSION} SOL... (Saldo en espera: ${saldo.toFixed(3)} SOL)`);
-    console.log(`⏳ Esperando 60s. SEMÁFORO EN ROJO (Ignorando la basura de Pump.fun)...`);
+    console.log(`🛒 Comprando ${INVERSION} SOL... (Saldo temporal en caja: ${saldo.toFixed(3)} SOL)`);
+    console.log(`⏳ Esperando 60s. SEMÁFORO EN ROJO...`);
 
     setTimeout(async () => {
         try {
@@ -57,13 +56,16 @@ async function ejecutarOperacionReal(firmaTx) {
             if (!token) {
                 console.log("⚠️ Transacción ilegible. Devolviendo dinero.");
                 saldo += INVERSION;
+                console.log(`💼 SALDO ACTUALIZADO: ${saldo.toFixed(3)} SOL`);
                 operando = false; 
                 return;
             }
 
-            console.log(`🔍 Evaluando precio del token: ${token.mint}`);
-            const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${token.mint}`);
-            const data = await res.json();
+            console.log(`🔍 Buscando precio de: ${token.mint}`);
+            
+            // <--- AQUÍ 2: Usamos Axios en lugar de Fetch para pedir el precio a internet
+            const res = await axios.get(`https://api.dexscreener.com/latest/dex/tokens/${token.mint}`);
+            const data = res.data;
 
             if (data.pairs && data.pairs.length > 0) {
                 const porcentaje = data.pairs[0].priceChange.m5 || 0; 
@@ -73,23 +75,28 @@ async function ejecutarOperacionReal(firmaTx) {
                 saldo += dineroRecuperado;
                 
                 if (porcentaje > 0) {
-                    console.log(`✅ ¡ÉXITO! +${porcentaje}% | Saldo total: ${saldo.toFixed(3)} SOL`);
+                    console.log(`✅ ¡ÉXITO! +${porcentaje}% | 💼 SALDO BANCARIO: ${saldo.toFixed(3)} SOL`);
                 } else {
-                    console.log(`❌ PÉRDIDA. ${porcentaje}% | Saldo total: ${saldo.toFixed(3)} SOL`);
+                    console.log(`❌ PÉRDIDA. ${porcentaje}% | 💼 SALDO BANCARIO: ${saldo.toFixed(3)} SOL`);
                 }
             } else {
-                console.log(`💀 RUG PULL (Estafa / Sin liquidez). Pierdes los ${INVERSION} SOL.`);
+                console.log(`💀 RUG PULL (Estafa). Pierdes los ${INVERSION} SOL.`);
+                console.log(`💼 SALDO BANCARIO: ${saldo.toFixed(3)} SOL`);
             }
 
         } catch (error) {
-            console.log(`⚠️ ERROR TÉCNICO AL BUSCAR PRECIO: ${error.message}`);
+            console.log(`⚠️ ERROR TÉCNICO: ${error.message}`);
             saldo += INVERSION;
+            console.log(`💼 SALDO (Dinero devuelto por error): ${saldo.toFixed(3)} SOL`);
         }
         
         console.log("🟢 Semáforo en VERDE. Listo para el siguiente disparo...\n");
-        operando = false; // SEMÁFORO VERDE: Vuelve a cazar
+        operando = false; 
 
     }, 60000); 
+}
+
+iniciar().catch(err => console.error("❌ ERROR CRÍTICO:", err));
 }
 
 iniciar().catch(err => console.error("❌ ERROR CRÍTICO:", err));

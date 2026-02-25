@@ -1,5 +1,5 @@
 const { Connection, PublicKey } = require('@solana/web3.js');
-const axios = require('axios'); // <--- AQUÍ 1: Le decimos al bot que cargue Axios
+const axios = require('axios'); // La herramienta bien escrita
 
 const API_KEY = "84f545e5-e414-4d68-b1fc-fe13e070d03e"; 
 const RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${API_KEY}`;
@@ -63,7 +63,6 @@ async function ejecutarOperacionReal(firmaTx) {
 
             console.log(`🔍 Buscando precio de: ${token.mint}`);
             
-            // <--- AQUÍ 2: Usamos Axios en lugar de Fetch para pedir el precio a internet
             const res = await axios.get(`https://api.dexscreener.com/latest/dex/tokens/${token.mint}`);
             const data = res.data;
 
@@ -94,9 +93,6 @@ async function ejecutarOperacionReal(firmaTx) {
         operando = false; 
 
     }, 60000); 
-}
-
-iniciar().catch(err => console.error("❌ ERROR CRÍTICO:", err));
 }
 
 iniciar().catch(err => console.error("❌ ERROR CRÍTICO:", err));

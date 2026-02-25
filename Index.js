@@ -29,7 +29,7 @@ async function main() {
         RAYDIUM_PROGRAM_ID,
         async ({ logs, err, signature }) => {
             if (err) return;
-            if (logs && logs.some(log => log.includes("initialize2"))) {
+            if (logs && (logs.some(log => log.includes("initialize2")) || logs.some(log => log.includes("InitializeInstruction2")))) {
                 console.log(`\n🚨 ¡NUEVA MONEDA DETECTADA!`);
                 console.log(`🔗 Tx: https://solscan.io/tx/${signature}`);
                 ejecutarTradeRealista(signature);

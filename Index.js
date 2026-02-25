@@ -1,7 +1,7 @@
 const { Connection, PublicKey } = require('@solana/web3.js');
 
 
-const API_KEY = "DEQ9OCjU2hYKcZWoHYDE6"; 
+const API_KEY = "84f545e5-e414-4d68-b1fc-fe13e070d03e"; 
 
 // Construimos las direcciones VIP
 const RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${API_KEY}`;

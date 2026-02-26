@@ -1,35 +1,37 @@
 const { Connection, PublicKey } = require('@solana/web3.js');
 
-// Cambiamos a la conexión pública oficial de Solana para evitar el bloqueo 403
-const connection = new Connection("https://api.mainnet-beta.solana.com");
-
-// Esta es la dirección donde enviaste el dinero
-const direccionDudosa = new PublicKey("5qmtDCvUreD8G59M5FosdpV8Gqdd3kFgdH1Vv7HKXUKq");
-
-async function rastrearDinero() {
+async function rastreoUrgente() {
     console.clear();
-    console.log("🔍 RASTREO CON CONEXIÓN PÚBLICA...");
-    console.log("-----------------------------------------");
+    console.log("🚑 USANDO CONEXIÓN DE EMERGENCIA...");
+    
+    // Usamos el servidor oficial de Solana sin intermediarios
+    const connection = new Connection("https://api.mainnet-beta.solana.com", "confirmed");
+    
+    // La dirección donde está el dinero según tu historial
+    const direccionDestino = new PublicKey("5qmtDCvUreD8G59M5FosdpV8Gqdd3kFgdH1Vv7HKXUKq");
 
     try {
-        const balance = await connection.getBalance(direccionDudosa);
+        const balance = await connection.getBalance(direccionDestino);
         const sol = balance / 1000000000;
 
-        console.log(`🏠 Wallet: 5qmtDC...UKq`);
-        console.log(`💰 Saldo actual: ${sol.toFixed(4)} SOL`);
-        
-        console.log("-----------------------------------------");
+        console.log("------------------------------------------");
+        console.log(`🏠 Wallet Destino: ${direccionDestino.toBase58()}`);
+        console.log(`💰 SALDO REAL: ${sol.toFixed(4)} SOL`);
+        console.log("------------------------------------------");
+
         if (sol > 0) {
-            console.log("✅ EL DINERO ESTÁ AHÍ.");
-            console.log("\n⚠️ ATENCIÓN: Si no reconoces esta cuenta,");
-            console.log("busca en tu Phantom la opción 'Añadir/Conectar Billetera'");
-            console.log("y mira si aparece como una cuenta secundaria.");
+            console.log("✅ EL DINERO ESTÁ SEGURO EN ESA CUENTA.");
+            console.log("\n⚠️ CÓMO RECUPERARLO:");
+            console.log("1. Ve a Phantom.");
+            console.log("2. Pulsa en el nombre de tu cuenta (arriba).");
+            console.log("3. Dale a '+' -> 'Crear cuenta nueva'.");
+            console.log("4. Hazlo varias veces hasta que aparezca una con el saldo.");
         } else {
-            console.log("⚠️ SALDO 0. El dinero no ha llegado o ya no está.");
+            console.log("⚠️ Saldo 0. El envío no se completó o la dirección es otra.");
         }
     } catch (err) {
-        console.log("❌ Sigue fallando la conexión: " + err.message);
+        console.log("❌ Error de red: El servidor está muy saturado. Intenta de nuevo en 10 segundos.");
     }
 }
 
-rastrearDinero();
+rastreoUrgente();

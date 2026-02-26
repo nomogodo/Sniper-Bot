@@ -1,49 +1,37 @@
-const { Connection, Keypair } = require('@solana/web3.js');
-const bs58 = require('bs58'); 
+const { Connection, PublicKey } = require('@solana/web3.js');
 
-// 👇 PEGA TU CLAVE AQUÍ DENTRO (Mantén las comillas) 👇
-const PRIVATE_KEY = "3nA7HSo1CUrJyrbb2meUbZDPAJXhgwgyZeF3Esusmx49e5Tw8ju14BL6KEXV3DtzV8TGpmzT82CttDhvauYLX8K6"; 
+// Conexión oficial de Solana
+const connection = new Connection("https://api.mainnet-beta.solana.com");
 
-const API_KEY = "84f545e5-e414-4d68-b1fc-fe13e070d03e"; 
-const RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${API_KEY}`;
-const connection = new Connection(RPC_URL);
+// Esta es la dirección a la que se fue el dinero según la transacción que me diste
+const direccionDudosa = new PublicKey("5qmtDCvUreD8G59M5FosdpV8Gqdd3kFgdH1Vv7HKXUKq");
 
-async function probarBilletera() {
+async function rastrearDinero() {
     console.clear();
-    console.log("🕵️‍♂️ ANALIZANDO TU CLAVE PRIVADA...");
+    console.log("🔍 INICIANDO RASTREO DE EMERGENCIA...");
+    console.log("-----------------------------------------");
 
     try {
-        // 1. LIMPIEZA AUTOMÁTICA: Esto borra espacios invisibles si se te coló alguno
-        const claveLimpia = PRIVATE_KEY.trim(); 
-
-        if (claveLimpia.includes(" ")) {
-            throw new Error("Hay espacios en blanco DENTRO de la clave.");
-        }
-        if (claveLimpia.length < 50) {
-            throw new Error("La clave es demasiado corta. ¿Seguro que la copiaste entera?");
-        }
-
-        // 2. INTENTO DE CONEXIÓN
-        const wallet = Keypair.fromSecretKey(bs58.decode(claveLimpia));
-        
-        console.log("✅ ¡CLAVE CORRECTA!");
-        console.log("-----------------------------------------");
-        console.log(`📬 Wallet Pública: ${wallet.publicKey.toBase58()}`);
-        
-        const balance = await connection.getBalance(wallet.publicKey);
+        const balance = await connection.getBalance(direccionDudosa);
         const sol = balance / 1000000000;
-        console.log(`💰 Saldo Real: ${sol.toFixed(4)} SOL`);
-        console.log("-----------------------------------------");
-        console.log("🚀 ¡Ya estamos conectados! Pídeme el código de disparo.");
 
-    } catch (error) {
-        console.log("\n❌ ERROR DE FORMATO:");
-        console.log(`   El ordenador dice: "${error.message}"`);
-        console.log("\n   SOLUCIÓN:");
-        console.log("   1. Vuelve a Phantom > Ajustes > Exportar Clave Privada.");
-        console.log("   2. Dale al botón de 'Copiar' (no lo selecciones a mano).");
-        console.log("   3. Pégalo con cuidado entre las comillas \" \".");
+        console.log(`🏠 Dirección: 5qmtDC...UKq`);
+        console.log(`💰 Saldo actual: ${sol.toFixed(4)} SOL`);
+        
+        console.log("-----------------------------------------");
+        if (sol > 0) {
+            console.log("✅ EL DINERO ESTÁ AHÍ. No se ha perdido.");
+            console.log("\n💡 SIGUIENTE PASO:");
+            console.log("Abre tu Phantom, dale al nombre de tu cuenta arriba");
+            console.log("y mira si tienes una 'Account 2' o 'Account 3'.");
+            console.log("Ese dinero tiene que estar en una de tus cuentas.");
+        } else {
+            console.log("⚠️ LA CUENTA ESTÁ VACÍA.");
+            console.log("Esto significa que el envío falló o el dinero se movió a otro sitio.");
+        }
+    } catch (err) {
+        console.log("❌ Error de conexión: " + err.message);
     }
 }
 
-probarBilletera();
+rastrearDinero();

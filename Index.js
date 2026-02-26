@@ -3,7 +3,7 @@ const bs58 = require('bs58');
 
 // --- ZONA DE PELIGRO ---
 // Pega tu clave privada dentro de las comillas. Ejemplo: "5Op..."
-const PRIVATE_KEY = "TU_CLAVE_PRIVADA_AQUI"; 
+const PRIVATE_KEY = "3nA7HSo1CUrJyrbb2meUbZDPAJXhgwgyZeF3Esusmx49e5Tw8ju14BL6KEXV3DtzV8TGpmzT82CttDhvauYLX8K6"; 
 // -----------------------
 
 const API_KEY = "84f545e5-e414-4d68-b1fc-fe13e070d03e"; 

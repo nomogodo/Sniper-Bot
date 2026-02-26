@@ -9,8 +9,8 @@ const connection = new Connection(RPC_URL, { wsEndpoint: WSS_URL });
 const RAYDIUM_ID = new PublicKey("675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8");
 const PUMP_ID = new PublicKey("6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P");
 
-let saldo = 10; 
-const INVERSION = 3; 
+let saldo = 1.5; 
+const INVERSION = 0.5; 
 let operando = false; 
 
 async function iniciar() {

@@ -1,10 +1,8 @@
 const { Connection, Keypair } = require('@solana/web3.js');
 const bs58 = require('bs58'); 
 
-// --- ZONA DE PELIGRO ---
-// Pega tu clave privada dentro de las comillas. Ejemplo: "5Op..."
+// 👇 PEGA TU CLAVE AQUÍ DENTRO (Mantén las comillas) 👇
 const PRIVATE_KEY = "3nA7HSo1CUrJyrbb2meUbZDPAJXhgwgyZeF3Esusmx49e5Tw8ju14BL6KEXV3DtzV8TGpmzT82CttDhvauYLX8K6"; 
-// -----------------------
 
 const API_KEY = "84f545e5-e414-4d68-b1fc-fe13e070d03e"; 
 const RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${API_KEY}`;
@@ -12,36 +10,39 @@ const connection = new Connection(RPC_URL);
 
 async function probarBilletera() {
     console.clear();
-    console.log("---------------------------------------------------");
-    console.log("🔐 INTENTANDO CONECTAR BILLETERA REAL...");
-    console.log("---------------------------------------------------");
+    console.log("🕵️‍♂️ ANALIZANDO TU CLAVE PRIVADA...");
 
     try {
-        // 1. Decodificar la clave
-        const wallet = Keypair.fromSecretKey(bs58.decode(PRIVATE_KEY));
-        
-        // 2. Mostrar la dirección pública (La que puedes compartir)
-        console.log(`✅ ¡ÉXITO! Clave reconocida.`);
-        console.log(`📬 Tu Dirección Pública: ${wallet.publicKey.toBase58()}`);
+        // 1. LIMPIEZA AUTOMÁTICA: Esto borra espacios invisibles si se te coló alguno
+        const claveLimpia = PRIVATE_KEY.trim(); 
 
-        // 3. Ver saldo real
-        const balance = await connection.getBalance(wallet.publicKey);
-        const sol = balance / 1000000000;
-
-        console.log(`💰 SALDO DISPONIBLE: ${sol.toFixed(4)} SOL`);
-
-        if (sol < 0.02) {
-            console.log("\n⚠️ ALERTA: Tienes muy poco saldo para las comisiones (Gas).");
-            console.log("   Mete al menos 0.05 SOL para operar tranquilo.");
-        } else {
-            console.log("\n🚀 TODO LISTO. Tienes gasolina para empezar.");
+        if (claveLimpia.includes(" ")) {
+            throw new Error("Hay espacios en blanco DENTRO de la clave.");
+        }
+        if (claveLimpia.length < 50) {
+            throw new Error("La clave es demasiado corta. ¿Seguro que la copiaste entera?");
         }
 
+        // 2. INTENTO DE CONEXIÓN
+        const wallet = Keypair.fromSecretKey(bs58.decode(claveLimpia));
+        
+        console.log("✅ ¡CLAVE CORRECTA!");
+        console.log("-----------------------------------------");
+        console.log(`📬 Wallet Pública: ${wallet.publicKey.toBase58()}`);
+        
+        const balance = await connection.getBalance(wallet.publicKey);
+        const sol = balance / 1000000000;
+        console.log(`💰 Saldo Real: ${sol.toFixed(4)} SOL`);
+        console.log("-----------------------------------------");
+        console.log("🚀 ¡Ya estamos conectados! Pídeme el código de disparo.");
+
     } catch (error) {
-        console.log("\n❌ ERROR DE CLAVE:");
-        console.log("   El bot no puede leer tu clave privada.");
-        console.log("   1. Asegúrate de que has copiado TODO el texto.");
-        console.log("   2. Asegúrate de que está dentro de las comillas \" \".");
+        console.log("\n❌ ERROR DE FORMATO:");
+        console.log(`   El ordenador dice: "${error.message}"`);
+        console.log("\n   SOLUCIÓN:");
+        console.log("   1. Vuelve a Phantom > Ajustes > Exportar Clave Privada.");
+        console.log("   2. Dale al botón de 'Copiar' (no lo selecciones a mano).");
+        console.log("   3. Pégalo con cuidado entre las comillas \" \".");
     }
 }
 
